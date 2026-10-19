@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>여름 네컷사진관 🏖️</title>
+<style>
+  :root{
+    --sea:#2CA6CF; --sea-deep:#1B7FA6; --sun:#FFD25A; --sand:#FDEBC6;
+    --coral:#FF6E75; --melon:#FF8FA3; --mint:#7FD1A8; --cream:#FFF7EC;
+    --ink:#123A4A; --shadow: 0 10px 30px rgba(18,58,74,.18);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%; margin:0;}
+  body{
+    font-family:'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 500px at 50% -10%, #BFEBFB 0%, transparent 60%),
+      linear-gradient(180deg,#DFF6FF 0%, #EAF9EF 55%, #FFF7EC 100%);
+    overflow:hidden; user-select:none; -webkit-user-select:none;
+  }
+  .screen{position:fixed; inset:0; display:none; flex-direction:column;
+    align-items:center; justify-content:center; padding:24px; text-align:center;}
+  .screen.on{display:flex; animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+
+  h1{font-size:clamp(34px,6vw,64px); margin:.1em 0; letter-spacing:-1px;
+     color:var(--sea-deep);
+     text-shadow:2px 3px 0 #fff, 4px 6px 0 rgba(43,166,207,.18);}
+  .sub{font-size:clamp(15px,2.4vw,22px); color:#3a6d80; opacity:.9; margin-bottom:6px;}
+
+  /* --- big friendly buttons --- */
+  .btn{border:none; cursor:pointer; font-family:inherit; font-weight:800;
+    border-radius:999px; padding:18px 34px; font-size:clamp(18px,2.6vw,26px);
+    color:#fff; background:linear-gradient(180deg,var(--coral),#ff535c);
+    box-shadow:0 8px 0 #d84a52, var(--shadow); transition:transform .08s, box-shadow .08s;}
+  .btn:active{transform:translateY(4px); box-shadow:0 4px 0 #d84a52, var(--shadow);}
+  .btn.sea{background:linear-gradient(180deg,#37b8de,var(--sea)); box-shadow:0 8px 0 #1b7fa6, var(--shadow);}
+  .btn.sea:active{box-shadow:0 4px 0 #1b7fa6, var(--shadow);}
+  .btn.ghost{background:#fff; color:var(--sea-deep); box-shadow:0 6px 0 #cfe9f2, var(--shadow);}
+  .btn.ghost:active{box-shadow:0 3px 0 #cfe9f2, var(--shadow);}
+  .btn.sm{padding:12px 20px; font-size:clamp(15px,2vw,19px);}
+  .row{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; align-items:center;}
+
+  /* --- floating summer emojis on intro --- */
+  .floaties{position:absolute; inset:0; pointer-events:none; overflow:hidden;}
+  .floaties span{position:absolute; font-size:38px; opacity:.55; animation:bob 6s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(0);} 50%{transform:translateY(-22px) rotate(8deg);}}
+
+  /* ---------- THEME PICKER ---------- */
+  .themes{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:16px; width:min(820px,92vw); margin-top:8px;}
+  .theme-card{border:4px solid #fff; border-radius:22px; padding:14px 10px 16px;
+    cursor:pointer; box-shadow:var(--shadow); transition:transform .1s;
+    display:flex; flex-direction:column; align-items:center; gap:6px; color:#fff;}
+  .theme-card:active{transform:scale(.97);}
+  .theme-card .em{font-size:44px; filter:drop-shadow(0 3px 4px rgba(0,0,0,.15));}
+  .theme-card .nm{font-weight:800; font-size:19px; text-shadow:0 1px 2px rgba(0,0,0,.2);}
+  .theme-card.sel{outline:5px solid var(--sun); outline-offset:2px;}
+
+  /* ---------- CAMERA ---------- */
+  #camWrap{position:relative; width:min(560px,86vw); aspect-ratio:1/1;
+    border-radius:26px; overflow:hidden; background:#0a2531; box-shadow:var(--shadow);
+    border:6px solid #fff;}
+  #video{width:100%; height:100%; object-fit:cover; transform:scaleX(-1);}
+  #flash{position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none;}
+  #flash.go{animation:flash .5s ease;}
+  @keyframes flash{0%{opacity:.9;} 100%{opacity:0;}}
+  #count{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:26vw; font-weight:900; color:#fff; text-shadow:0 6px 20px rgba(0,0,0,.35);
+    pointer-events:none;}
+  #count.pop{animation:pop .9s ease;}
+  @keyframes pop{0%{transform:scale(.4); opacity:0;} 30%{transform:scale(1.1); opacity:1;}
+    80%{transform:scale(1); opacity:1;} 100%{transform:scale(1.3); opacity:0;}}
+  .cambadge{position:absolute; top:12px; left:12px; background:rgba(18,58,74,.65);
+    color:#fff; padding:8px 16px; border-radius:999px; font-weight:800; font-size:18px;}
+  .dots{display:flex; gap:10px; margin:16px 0;}
+  .dots i{width:16px; height:16px; border-radius:50%; background:#cfe4ec; display:block;}
+  .dots i.done{background:var(--coral);}
+  .thumbs{display:flex; gap:8px; margin-top:6px;}
+  .thumbs .t{width:64px; height:64px; border-radius:12px; background:#fff center/cover;
+    border:3px solid #fff; box-shadow:var(--shadow);}
+  .thumbs .t.empty{background:#e9f4f8; display:flex; align-items:center; justify-content:center; color:#a9cdda;}
+
+  /* ---------- DECORATE ---------- */
+  #decorate{justify-content:flex-start; padding:14px 12px;}
+  .deco-top{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center; margin-bottom:8px;}
+  #titleInput{font-family:inherit; font-weight:800; font-size:18px; text-align:center;
+    border:3px solid #cfe9f2; border-radius:999px; padding:8px 16px; color:var(--ink); width:min(280px,70vw);}
+  .stage{flex:1; display:flex; align-items:center; justify-content:center; width:100%; overflow:hidden;}
+
+  #card{width:380px; height:540px; border-radius:24px; position:relative;
+    box-shadow:var(--shadow); transform-origin:center center; overflow:hidden; touch-action:none;}
+  #card .title{position:absolute; left:0; right:0; top:22px; text-align:center;
+    font-weight:900; font-size:24px;}
+  #card .wave{position:absolute; left:0; right:0; top:56px; text-align:center; font-size:18px; letter-spacing:2px;}
+  #card .foot{position:absolute; left:0; right:0; bottom:16px; text-align:center;
+    font-size:14px; font-weight:700; opacity:.85;}
+  .cell{position:absolute; background:#fff; border-radius:14px; box-shadow:0 4px 10px rgba(18,58,74,.14); padding:6px;}
+  .cell .ph{width:100%; height:100%; border-radius:8px; background:#e9f4f8 center/cover no-repeat;}
+  .sticker{position:absolute; transform:translate(-50%,-50%); font-size:44px; line-height:1;
+    cursor:grab; touch-action:none; filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));}
+  .sticker.sel{outline:3px dashed var(--sea-deep); outline-offset:4px; border-radius:8px;}
+
+  /* palette + controls */
+  .tools{width:min(900px,96vw); margin-top:10px; display:flex; flex-direction:column; gap:8px;}
+  .palette{display:flex; gap:6px; overflow-x:auto; padding:8px; background:#fff; border-radius:18px;
+    box-shadow:var(--shadow); scrollbar-width:thin;}
+  .palette button{flex:0 0 auto; width:54px; height:54px; font-size:30px; border:none; background:#f2fafd;
+    border-radius:14px; cursor:pointer;}
+  .palette button:active{transform:scale(.9); background:#e3f4fa;}
+  .themebar{display:flex; gap:8px; justify-content:center; flex-wrap:wrap;}
+  .themebar button{width:44px; height:44px; border-radius:50%; border:4px solid #fff; cursor:pointer; font-size:20px;
+    box-shadow:0 4px 10px rgba(18,58,74,.15);}
+  .themebar button.sel{outline:4px solid var(--sun); outline-offset:2px;}
+  .ctrlbar{display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap;}
+  .ctrlbar .hint{color:#6d94a3; font-weight:700; font-size:15px;}
+  .ctrlbar button{border:none; border-radius:16px; padding:12px 16px; font-size:18px; font-weight:800;
+    background:#fff; color:var(--ink); box-shadow:0 5px 0 #d8ecf3; cursor:pointer;}
+  .ctrlbar button:active{transform:translateY(3px); box-shadow:0 2px 0 #d8ecf3;}
+  .ctrlbar button.del{background:#ffe6e7; color:#d84a52; box-shadow:0 5px 0 #f4c3c6;}
+  .ctrlbar button:disabled{opacity:.4;}
+
+  .finish-row{display:flex; gap:12px; justify-content:center; margin-top:10px; flex-wrap:wrap;}
+
+  /* error box */
+  #err{max-width:520px; background:#fff; border-radius:20px; padding:22px; box-shadow:var(--shadow);
+    display:none; margin-top:14px;}
+  #err.on{display:block;}
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important;} }
+</style>
+</head>
+<body>
+
+<!-- ===== 1. INTRO ===== -->
+<section id="intro" class="screen on">
+  <div class="floaties" id="floaties"></div>
+  <div class="sub">인천 · 우리 반 여름 추억 📸</div>
+  <h1>여름 네컷사진관</h1>
+  <div class="sub">카메라 앞에 서면 3·2·1 셋고 찰칵! 네 컷을 예쁘게 꾸며봐요 🍉</div>
+  <div class="row" style="margin-top:18px;">
+    <button class="btn" onclick="goThemes()">🌊 시작하기</button>
+  </div>
+</section>
+
+<!-- ===== 2. THEME ===== -->
+<section id="themeScreen" class="screen">
+  <div class="sub">어떤 여름 프레임으로 찍을까요?</div>
+  <h1 style="font-size:clamp(26px,4.5vw,42px);">테마 고르기</h1>
+  <div class="themes" id="themeGrid"></div>
+  <div class="row" style="margin-top:22px;">
+    <button class="btn ghost sm" onclick="show('intro')">← 뒤로</button>
+    <button class="btn sea" id="toCamBtn" onclick="goCamera()">카메라 켜기 📷</button>
+  </div>
+</section>
+
+<!-- ===== 3. CAMERA ===== -->
+<section id="camera" class="screen">
+  <div class="sub" id="camGuide">준비되면 <b>촬영 시작</b>을 눌러요. 컷마다 잠깐 쉬어가요!</div>
+  <div id="camWrap">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="cambadge" id="camBadge">1 / 4</div>
+    <div id="count"></div>
+    <div id="flash"></div>
+  </div>
+  <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+  <div class="thumbs" id="thumbs"></div>
+  <div class="row" id="camPick" style="display:none; margin-top:10px;">
+    <span style="font-weight:800; color:#3a6d80;">카메라</span>
+    <select id="camSelect" onchange="switchCam()" style="font-family:inherit; font-weight:700;
+      font-size:16px; padding:8px 14px; border-radius:12px; border:3px solid #cfe9f2; color:var(--ink);"></select>
+  </div>
+  <div class="row" style="margin-top:14px;">
+    <button class="btn ghost sm" onclick="backFromCamera()">← 테마</button>
+    <button class="btn" id="shootBtn" onclick="startSequence()">📸 촬영 시작</button>
+  </div>
+  <div id="err">
+    <h3 style="margin-top:0;">카메라를 켤 수 없어요 😢</h3>
+    <p id="errReason" style="line-height:1.6; color:#d84a52; font-weight:800;"></p>
+    <p id="errGuide" style="line-height:1.6; color:#4a6f7d;"></p>
+    <button class="btn sea sm" onclick="goCamera()">다시 시도</button>
+  </div>
+</section>
+
+<!-- ===== 4. DECORATE ===== -->
+<section id="decorate" class="screen">
+  <div class="deco-top">
+    <input id="titleInput" maxlength="16" value="여름 추억 ☀️" oninput="onTitle()">
+  </div>
+  <div class="stage" id="stage">
+    <div id="card"></div>
+  </div>
+
+  <div class="tools">
+    <div class="ctrlbar" id="ctrlbar">
+      <span class="hint" id="ctrlHint">스티커를 콕 눌러 고른 뒤 조절해요 👇</span>
+      <button id="bBig" onclick="resize(1.18)" disabled>➕ 크게</button>
+      <button id="bSmall" onclick="resize(.85)" disabled>➖ 작게</button>
+      <button id="bRot" onclick="rotate15()" disabled>🔄 회전</button>
+      <button id="bDel" class="del" onclick="delSticker()" disabled>🗑️ 삭제</button>
+    </div>
+    <div class="palette" id="palette"></div>
+    <div class="themebar" id="themebar"></div>
+  </div>
+
+  <div class="finish-row">
+    <button class="btn ghost sm" onclick="retake()">📷 다시 찍기</button>
+    <button class="btn" onclick="savePng()">💾 저장하기 (PNG)</button>
+  </div>
+</section>
+
+<script>
+/* =========================================================
+   여름 네컷사진관 — 오프라인 단일 HTML (USB 실행용)
+   ========================================================= */
+
+// ---------- 테마 정의 ----------
+const THEMES = [
+  {id:'sea',   name:'바다 파도', emoji:'🌊', from:'#8FE0F5', to:'#2CA6CF', ink:'#0d4a5f', wave:'🌊 🐚 🌊 🐚 🌊', foot:['🐬','🐚','🐠']},
+  {id:'melon', name:'수박 파티', emoji:'🍉', from:'#FFD9E1', to:'#7ED08A', ink:'#b0324a', wave:'🍉 🍧 🍉 🍧 🍉', foot:['🍉','🌱','🍧']},
+  {id:'cream', name:'아이스크림', emoji:'🍦', from:'#FFF0D6', to:'#C7F0E4', ink:'#c07a3a', wave:'🍦 🍨 🍦 🍨 🍦', foot:['🍦','🍨','🍧']},
+  {id:'sunset',name:'해변 노을', emoji:'🌅', from:'#FFE1B0', to:'#FF9E7A', ink:'#a8442a', wave:'🌴 🌅 🌴 🌅 🌴', foot:['🌴','⛱️','🌅']},
+  {id:'tropic',name:'트로피컬', emoji:'🌴', from:'#C7F5D9', to:'#3AC6C6', ink:'#0f6a5a', wave:'🌴 🦩 🌴 🦩 🌴', foot:['🦩','🥥','🌺']},
+];
+
+// ---------- 스티커 팔레트 ----------
+const STICKERS = ['🍉','🍦','🍧','🏖️','🌊','☀️','🌴','🩴','🕶️','🐚','🐠','🐬','⛱️','🌺','🥥','🦩','🌈','⭐','💦','🐳','🦀','🍹','🐙','🌸','🍓','😎','🌻','🫧'];
+
+// ---------- 카드 레이아웃 (카드 좌표, px) ----------
+const CARD_W=380, CARD_H=540, GAP=12, PAD=18;
+const CELL=(CARD_W-2*PAD-GAP)/2;           // 166
+const GTOP=86;
+const CELLS=[
+  {x:PAD,          y:GTOP},
+  {x:PAD+CELL+GAP, y:GTOP},
+  {x:PAD,          y:GTOP+CELL+GAP},
+  {x:PAD+CELL+GAP, y:GTOP+CELL+GAP},
+];
+const EMOJI_FONT = "'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif";
+const KR_FONT = "'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif";
+
+// ---------- 상태 ----------
+const state = {
+  themeIndex: 0,
+  captures: [],        // HTMLCanvasElement x4
+  stickers: [],        // {id,emoji,x,y,size,rot}
+  title: '여름 추억 ☀️',
+  selected: null,
+  stream: null,
+  stickerSeq: 0,
+  camId: null,
+};
+
+// ---------- 화면 전환 ----------
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+// intro floaties
+(function(){
+  const box=document.getElementById('floaties');
+  const em=['🍉','🌊','☀️','🐚','🍦','🌴','⛱️','🐬'];
+  for(let i=0;i<8;i++){
+    const s=document.createElement('span');
+    s.textContent=em[i];
+    s.style.left=(6+Math.random()*88)+'%';
+    s.style.top=(10+Math.random()*76)+'%';
+    s.style.animationDelay=(Math.random()*4)+'s';
+    s.style.fontSize=(30+Math.random()*26)+'px';
+    box.appendChild(s);
+  }
+})();
+
+// ---------- 테마 화면 ----------
+function goThemes(){ buildThemeGrid(); show('themeScreen'); }
+function buildThemeGrid(){
+  const g=document.getElementById('themeGrid'); g.innerHTML='';
+  THEMES.forEach((t,i)=>{
+    const c=document.createElement('div');
+    c.className='theme-card'+(i===state.themeIndex?' sel':'');
+    c.style.background=`linear-gradient(160deg,${t.from},${t.to})`;
+    c.innerHTML=`<div class="em">${t.emoji}</div><div class="nm">${t.name}</div>`;
+    c.onclick=()=>{ state.themeIndex=i; buildThemeGrid(); };
+    g.appendChild(c);
+  });
+}
+
+// ---------- 카메라 ----------
+function showCamError(reason, guide){
+  document.getElementById('errReason').textContent=reason;
+  document.getElementById('errGuide').innerHTML=guide;
+  document.getElementById('err').classList.add('on');
+  document.getElementById('shootBtn').disabled=true;
+}
+
+async function goCamera(){
+  show('camera');
+  document.getElementById('err').classList.remove('on');
+  resetShots();
+
+  // getUserMedia 자체가 없는 경우(미리보기 iframe / 보안 컨텍스트 아님)
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    showCamError(
+      '이 화면에서는 웹캠을 쓸 수 없어요 (미리보기·보안 제한).',
+      '파일을 <b>다운로드</b>한 뒤 <b>크롬(Chrome)</b>에서 직접 열어주세요.<br>USB로 교실 PC·전자칠판에서 여는 방식이면 정상 작동합니다.'
+    );
+    return;
+  }
+
+  const constraint = { audio:false,
+    video: state.camId ? { deviceId:{ exact:state.camId } } : true };
+
+  try{
+    state.stream = await navigator.mediaDevices.getUserMedia(constraint);
+    const v=document.getElementById('video');
+    v.srcObject=state.stream;
+    document.getElementById('shootBtn').disabled=false;
+    populateCameras();
+  }catch(e){
+    // 지정 카메라가 사라진 경우 → 기본 카메라로 재시도
+    if(e.name==='OverconstrainedError' && state.camId){ state.camId=null; return goCamera(); }
+
+    let reason='알 수 없는 오류: '+(e.name||e.message||e);
+    let guide='크롬으로 열고 주소창의 카메라 아이콘에서 <b>허용</b>을 눌러주세요.';
+
+    if(e.name==='NotAllowedError' || e.name==='SecurityError'){
+      reason='카메라 권한이 거부되었어요.';
+      guide='주소창의 카메라 아이콘 → <b>허용</b>으로 바꾼 뒤 <b>다시 시도</b>를 눌러주세요. '
+           +'미리보기 화면이라면 파일을 <b>다운로드해 크롬에서</b> 열어야 합니다.';
+    }else if(e.name==='NotFoundError' || e.name==='DevicesNotFoundError' || e.name==='OverconstrainedError'){
+      let n=0;
+      try{ const ds=await navigator.mediaDevices.enumerateDevices();
+           n=ds.filter(d=>d.kind==='videoinput').length; }catch(_){}
+      reason=`연결된 웹캠을 찾지 못했어요. (브라우저가 인식한 카메라: ${n}개)`;
+      if(n>0){
+        guide='카메라는 감지됐어요. 아래 <b>카메라</b> 목록에서 다른 장치를 골라보세요. '
+             +'다른 프로그램(줌·팀즈·다른 탭)이 쓰고 있으면 종료해 주세요.';
+        populateCameras();
+      }else{
+        guide='① 전자칠판·PC에 <b>웹캠(USB)</b> 연결 확인 (윈도우 “카메라” 앱으로 화면 나오는지 테스트)<br>'
+             +'② 윈도우 <b>설정 → 개인정보 보호 → 카메라</b>에서 “<b>앱이 카메라에 접근 허용</b>”과 아래 “<b>데스크톱 앱 허용</b>”을 켜기<br>'
+             +'③ 웹캠을 다시 꽂고 <b>다시 시도</b>';
+      }
+    }else if(e.name==='NotReadableError' || e.name==='TrackStartError'){
+      reason='다른 프로그램이 카메라를 사용 중이에요.';
+      guide='줌·팀즈·다른 크롬 탭 등 <b>카메라를 쓰는 프로그램을 모두 종료</b>한 뒤 다시 시도해 주세요.';
+    }
+    showCamError(reason, guide+'<br><br><small style="color:#7a95a1;">('+ (e.name||'Error') +')</small>');
+  }
+}
+
+// 인식된 카메라 목록 채우기 (2개 이상이면 선택 UI 표시)
+async function populateCameras(){
+  try{
+    const ds=await navigator.mediaDevices.enumerateDevices();
+    const vids=ds.filter(d=>d.kind==='videoinput');
+    const sel=document.getElementById('camSelect');
+    const pick=document.getElementById('camPick');
+    if(vids.length>1){
+      sel.innerHTML='';
+      vids.forEach((d,i)=>{
+        const o=document.createElement('option');
+        o.value=d.deviceId; o.textContent=d.label || `카메라 ${i+1}`;
+        sel.appendChild(o);
+      });
+      if(state.camId) sel.value=state.camId;
+      pick.style.display='flex';
+    }else{
+      pick.style.display='none';
+    }
+  }catch(_){}
+}
+function switchCam(){
+  state.camId=document.getElementById('camSelect').value;
+  stopCamera(); goCamera();
+}
+function stopCamera(){
+  if(state.stream){ state.stream.getTracks().forEach(t=>t.stop()); state.stream=null; }
+}
+function backFromCamera(){ stopCamera(); show('themeScreen'); }
+
+function resetShots(){
+  state.captures=[];
+  document.querySelectorAll('#dots i').forEach(d=>d.classList.remove('done'));
+  document.getElementById('camBadge').textContent='1 / 4';
+  const th=document.getElementById('thumbs'); th.innerHTML='';
+  for(let i=0;i<4;i++){
+    const d=document.createElement('div');
+    d.className='t empty'; d.textContent='·';
+    th.appendChild(d);
+  }
+}
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function startSequence(){
+  const shoot=document.getElementById('shootBtn');
+  const back=document.querySelector('#camera .btn.ghost');
+  shoot.disabled=true; back.disabled=true;
+  document.getElementById('camGuide').innerHTML='카메라를 보고 포즈! 곧 찍어요 ✨';
+
+  for(let i=0;i<4;i++){
+    document.getElementById('camBadge').textContent=`${i+1} / 4`;
+    // 컷당 카운트다운 3-2-1
+    for(let n=3;n>=1;n--){
+      const c=document.getElementById('count');
+      c.textContent=n; c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');
+      await sleep(950);
+    }
+    document.getElementById('count').textContent='';
+    flash();
+    capture(i);
+    // 컷 사이 쉬어가기
+    if(i<3){
+      document.getElementById('camGuide').innerHTML='좋아요! 다음 포즈 준비~ 🙌';
+      await sleep(1400);
+      document.getElementById('camGuide').innerHTML='카메라를 보고 포즈! 곧 찍어요 ✨';
+    }
+  }
+  await sleep(600);
+  stopCamera();
+  openDecorate();
+  shoot.disabled=false; back.disabled=false;
+  document.getElementById('camGuide').innerHTML='준비되면 <b>촬영 시작</b>을 눌러요. 컷마다 잠깐 쉬어가요!';
+}
+
+function flash(){
+  const f=document.getElementById('flash');
+  f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+}
+
+function capture(i){
+  const v=document.getElementById('video');
+  const vw=v.videoWidth||1280, vh=v.videoHeight||720;
+  const side=Math.min(vw,vh);               // 중앙 정사각 크롭
+  const sx=(vw-side)/2, sy=(vh-side)/2;
+  const CAP=560;
+  const cv=document.createElement('canvas'); cv.width=CAP; cv.height=CAP;
+  const ctx=cv.getContext('2d');
+  ctx.translate(CAP,0); ctx.scale(-1,1);    // 거울(셀카) 모드
+  ctx.drawImage(v, sx,sy,side,side, 0,0,CAP,CAP);
+  state.captures[i]=cv;
+
+  // 진행 표시 + 썸네일
+  document.querySelectorAll('#dots i')[i].classList.add('done');
+  const t=document.querySelectorAll('#thumbs .t')[i];
+  t.classList.remove('empty'); t.textContent='';
+  t.style.backgroundImage=`url(${cv.toDataURL()})`;
+}
+
+// ---------- 꾸미기 ----------
+function openDecorate(){
+  show('decorate');
+  buildPalette();
+  buildThemebar();
+  document.getElementById('titleInput').value=state.title;
+  state.stickers=[]; state.selected=null;
+  renderCard(); refreshCtrl();
+  requestAnimationFrame(fitCard);
+}
+
+function buildPalette(){
+  const p=document.getElementById('palette'); p.innerHTML='';
+  STICKERS.forEach(em=>{
+    const b=document.createElement('button');
+    b.textContent=em; b.onclick=()=>addSticker(em);
+    p.appendChild(b);
+  });
+}
+function buildThemebar(){
+  const bar=document.getElementById('themebar'); bar.innerHTML='';
+  THEMES.forEach((t,i)=>{
+    const b=document.createElement('button');
+    b.textContent=t.emoji;
+    b.style.background=`linear-gradient(160deg,${t.from},${t.to})`;
+    b.className=(i===state.themeIndex?'sel':'');
+    b.onclick=()=>{ state.themeIndex=i; buildThemebar(); renderCard(); };
+    bar.appendChild(b);
+  });
+}
+
+function onTitle(){ state.title=document.getElementById('titleInput').value; renderCard(); }
+
+function dateStr(){
+  const d=new Date();
+  const p=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())}`;
+}
+
+// 카드 DOM 렌더 (레이아웃 상수를 export와 공유)
+function renderCard(){
+  const t=THEMES[state.themeIndex];
+  const card=document.getElementById('card');
+  card.style.background=`linear-gradient(165deg,${t.from} 0%, ${t.to} 100%)`;
+  card.innerHTML='';
+
+  const title=document.createElement('div');
+  title.className='title'; title.style.color=t.ink; title.textContent=state.title;
+  card.appendChild(title);
+
+  const wave=document.createElement('div');
+  wave.className='wave'; wave.textContent=t.wave;
+  card.appendChild(wave);
+
+  CELLS.forEach((c,i)=>{
+    const cell=document.createElement('div');
+    cell.className='cell';
+    cell.style.left=c.x+'px'; cell.style.top=c.y+'px';
+    cell.style.width=CELL+'px'; cell.style.height=CELL+'px';
+    const ph=document.createElement('div'); ph.className='ph';
+    if(state.captures[i]) ph.style.backgroundImage=`url(${state.captures[i].toDataURL()})`;
+    cell.appendChild(ph);
+    card.appendChild(cell);
+  });
+
+  const foot=document.createElement('div');
+  foot.className='foot'; foot.style.color=t.ink;
+  foot.textContent=`${t.foot.join(' ')}   ${dateStr()}`;
+  card.appendChild(foot);
+
+  // 스티커
+  state.stickers.forEach(s=>card.appendChild(makeStickerEl(s)));
+
+  // 빈 곳 탭 → 선택 해제
+  card.onpointerdown=(e)=>{ if(e.target===card){ selectSticker(null); } };
+}
+
+function makeStickerEl(s){
+  const el=document.createElement('div');
+  el.className='sticker'+(state.selected===s.id?' sel':'');
+  el.textContent=s.emoji;
+  el.style.left=s.x+'px'; el.style.top=s.y+'px';
+  el.style.fontSize=s.size+'px';
+  el.style.transform=`translate(-50%,-50%) rotate(${s.rot}deg)`;
+  el.dataset.id=s.id;
+  attachDrag(el,s);
+  return el;
+}
+
+function addSticker(emoji){
+  const s={id:++state.stickerSeq, emoji, x:CARD_W/2, y:CARD_H/2, size:52, rot:0};
+  state.stickers.push(s);
+  state.selected=s.id;
+  renderCard(); refreshCtrl();
+}
+
+function selectSticker(id){
+  state.selected=id;
+  document.querySelectorAll('#card .sticker').forEach(el=>{
+    el.classList.toggle('sel', Number(el.dataset.id)===id);
+  });
+  refreshCtrl();
+}
+
+// 드래그 (마우스+터치 통합: pointer events)
+function attachDrag(el,s){
+  let dragging=false, ox=0, oy=0;
+  el.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    selectSticker(s.id);
+    dragging=true; el.setPointerCapture(e.pointerId); el.style.cursor='grabbing';
+    const p=toCard(e.clientX,e.clientY);
+    ox=p.x-s.x; oy=p.y-s.y;
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!dragging) return;
+    const p=toCard(e.clientX,e.clientY);
+    s.x=clamp(p.x-ox, 0, CARD_W);
+    s.y=clamp(p.y-oy, 0, CARD_H);
+    el.style.left=s.x+'px'; el.style.top=s.y+'px';
+  });
+  const end=()=>{ dragging=false; el.style.cursor='grab'; };
+  el.addEventListener('pointerup',end);
+  el.addEventListener('pointercancel',end);
+}
+
+// 화면좌표 → 카드좌표 (transform scale 보정)
+function toCard(clientX,clientY){
+  const card=document.getElementById('card');
+  const r=card.getBoundingClientRect();
+  const k=r.width/CARD_W;
+  return { x:(clientX-r.left)/k, y:(clientY-r.top)/k };
+}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+// 선택 스티커 조작
+function curSticker(){ return state.stickers.find(s=>s.id===state.selected); }
+function resize(f){ const s=curSticker(); if(!s)return; s.size=clamp(s.size*f,20,180); renderCard(); }
+function rotate15(){ const s=curSticker(); if(!s)return; s.rot=(s.rot+15)%360; renderCard(); }
+function delSticker(){
+  const s=curSticker(); if(!s)return;
+  state.stickers=state.stickers.filter(x=>x.id!==s.id);
+  state.selected=null; renderCard(); refreshCtrl();
+}
+function refreshCtrl(){
+  const has=!!curSticker();
+  ['bBig','bSmall','bRot','bDel'].forEach(id=>document.getElementById(id).disabled=!has);
+  document.getElementById('ctrlHint').style.display = has?'none':'inline';
+}
+
+// 카드 화면 맞춤 스케일
+function fitCard(){
+  const stage=document.getElementById('stage');
+  const card=document.getElementById('card');
+  const k=Math.min((stage.clientWidth-16)/CARD_W, (stage.clientHeight-16)/CARD_H, 1.4);
+  card.style.transform=`scale(${k})`;
+}
+window.addEventListener('resize',()=>{ if(document.getElementById('decorate').classList.contains('on')) fitCard(); });
+
+function retake(){ show('themeScreen'); }
+
+// ---------- PNG 저장 (캔버스 합성) ----------
+function savePng(){
+  selectSticker(null);
+  const ES=2.6;
+  const W=CARD_W*ES, H=CARD_H*ES;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  const t=THEMES[state.themeIndex];
+
+  // 배경 그라디언트 (라운드 클립)
+  roundRect(ctx,0,0,W,H,24*ES); ctx.clip();
+  const g=ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,t.from); g.addColorStop(1,t.to);
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  // 제목
+  ctx.fillStyle=t.ink; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font=`900 ${24*ES}px ${KR_FONT}`;
+  ctx.fillText(state.title, W/2, 34*ES);
+  // 웨이브 이모지
+  ctx.font=`${18*ES}px ${EMOJI_FONT}`;
+  ctx.fillText(t.wave, W/2, 65*ES);
+
+  // 사진 셀
+  CELLS.forEach((c,i)=>{
+    const x=c.x*ES, y=c.y*ES, s=CELL*ES;
+    ctx.save();
+    ctx.shadowColor='rgba(18,58,74,.18)'; ctx.shadowBlur=10*ES; ctx.shadowOffsetY=4*ES;
+    roundRect(ctx,x,y,s,s,14*ES); ctx.fillStyle='#fff'; ctx.fill();
+    ctx.restore();
+    const pad=6*ES;
+    ctx.save();
+    roundRect(ctx,x+pad,y+pad,s-2*pad,s-2*pad,8*ES); ctx.clip();
+    if(state.captures[i]) ctx.drawImage(state.captures[i], x+pad,y+pad,s-2*pad,s-2*pad);
+    else { ctx.fillStyle='#e9f4f8'; ctx.fillRect(x+pad,y+pad,s-2*pad,s-2*pad); }
+    ctx.restore();
+  });
+
+  // 푸터
+  ctx.fillStyle=t.ink; ctx.font=`700 ${14*ES}px ${KR_FONT}`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(`${t.foot.join(' ')}   ${dateStr()}`, W/2, (CARD_H-16)*ES);
+
+  // 스티커
+  state.stickers.forEach(s=>{
+    ctx.save();
+    ctx.translate(s.x*ES, s.y*ES);
+    ctx.rotate(s.rot*Math.PI/180);
+    ctx.font=`${s.size*ES}px ${EMOJI_FONT}`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(s.emoji,0,0);
+    ctx.restore();
+  });
+
+  cv.toBlob(blob=>{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const d=new Date(); const p=n=>String(n).padStart(2,'0');
+    a.href=url;
+    a.download=`여름네컷_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.png`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  },'image/png');
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function goCamera_wrap(){} // (예약)
+</script>
+</body>
+</html>
