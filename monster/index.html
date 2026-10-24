@@ -302,7 +302,7 @@
 
 <script>
 const TABS = ['intro','snack','sound','photo','dance'];
-const BGM_SOURCES = { intro:'/music/intro.mp3', snack:'/music/snack.mp3', sound:'/music/sound_bg.mp3', photo:'/music/photo_bg.mp3' };
+const BGM_SOURCES = { intro:'music/intro.mp3', snack:'music/snack.mp3', sound:'music/sound_bg.mp3', photo:'music/photo_bg.mp3' };
 const bgmAudios = { intro:document.getElementById('bgm-intro'), snack:document.getElementById('bgm-snack'), sound:document.getElementById('bgm-sound'), photo:document.getElementById('bgm-photo') };
 const bgmState = { intro:false, snack:false, sound:false, photo:false };
 
@@ -318,7 +318,7 @@ preloadMonsterAssets();
 
 function toggleBgm(page) {
   const audio=bgmAudios[page], dot=document.getElementById('dot-'+page), label=document.getElementById('label-'+page), btn=document.querySelector('#bg-bar-'+page+' button');
-  if (!audio.src||!audio.src.includes('/music/')) audio.src=BGM_SOURCES[page];
+  if (!audio.src||!audio.src.includes('music/')) audio.src=BGM_SOURCES[page];
   if (bgmState[page]) {
     audio.pause(); bgmState[page]=false; dot.classList.add('off');
     label.style.color='rgba(255,255,255,0.5)'; label.textContent='배경음악 꺼짐'; btn.textContent='▶ 재생';
@@ -1084,7 +1084,7 @@ function renderDanceGuide(){
 function toggleDanceMusic(){
  const btn=document.getElementById('music-btn'),dot=document.getElementById('dot-dance'),label=document.getElementById('label-dance');
  if(dancePlay){danceAudio.pause();dancePlay=false;btn.textContent='▶ 음악 시작';dot.classList.add('off');label.textContent='dance_bg.mp3 · 반복';}
- else {if(!danceAudio.src)danceAudio.src='/music/dance_bg.mp3';danceAudio.play().then(()=>{dancePlay=true;btn.textContent='⏸ 음악 멈추기';dot.classList.remove('off');label.textContent='🎵 재생 중';}).catch(()=>{label.textContent='음악 파일을 확인해 주세요';});}
+ else {if(!danceAudio.src)danceAudio.src='music/dance_bg.mp3';danceAudio.play().then(()=>{dancePlay=true;btn.textContent='⏸ 음악 멈추기';dot.classList.remove('off');label.textContent='🎵 재생 중';}).catch(()=>{label.textContent='음악 파일을 확인해 주세요';});}
 }
 window.addEventListener('resize',renderDanceGuide);
 renderDanceGuide();
