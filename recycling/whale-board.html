@@ -49,11 +49,26 @@
 .top{z-index:7}.footer{z-index:7}.corner,.status{z-index:8}
 .board:not([data-stage="5"]) .happy{display:none!important}.board[data-stage="5"] .happy{display:none!important}
 @media(max-width:700px){.whaleHero{width:86vw;left:7%;top:29%;height:43vh}.stageNotice{top:22%}.center-text{bottom:25%}.footer{bottom:5%}}
-</style></head><body><main class="board" id="board" data-stage="0"><div class="backdrop"></div><div class="cleanSea"></div><div class="seaFloor"></div><div class="caustics"></div><div class="bubbleWorld" id="bubbleWorld"></div><div class="whaleHero"><img src="assets/whale_happy.png" alt="기운을 되찾아 헤엄치는 고래"></div><div class="splash" aria-hidden="true">💦</div><div class="sparkles" id="sparkles"></div><div class="successFly" id="successFly">잘했어! +1</div><div class="stageNotice" id="stageNotice">고래를 도와줘!</div><header class="top"><div><div class="title">고래를 구해요!</div><div class="sub">쓰레기를 바르게 분리하면 고래가 건강해져요!</div></div><div class="counter"><small>구조한 쓰레기</small><strong id="count">0 / 25</strong></div></header><div class="happy" id="happy"><img src="assets/whale_happy.png" alt="기뻐하는 고래"><h2>고마워!<br>다 함께<br>구해 줬어!</h2></div><div class="center-text" id="message">도와줘! 바다가 너무 아파요!</div><div class="footer"><div class="meter" id="meter" aria-label="구조 진행 상태"></div><div class="milestones"><span class="milestone" id="m0">시작</span><span class="milestone" id="m1">쓰레기 감소</span><span class="milestone" id="m2">그물 제거</span><span class="milestone" id="m3">기운 회복</span><span class="milestone" id="m4">고래 구조 성공!</span></div></div><button class="corner" id="settingsBtn">⚙ 교사 설정</button><div class="status" id="status">연결 준비 중</div></main>
+
+/* Version 3: genuine six-image scene changes */
+.backdrop,.cleanSea,.seaFloor,.whaleHero,.happy{display:none!important}
+.stageArt{position:absolute;inset:0;z-index:1;overflow:hidden;background:#096083}
+.stagePicture{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity 1.15s ease, transform 8s ease,filter 1s;transform:scale(1.035);will-change:opacity}
+.stagePicture.active{opacity:1;transform:scale(1)}
+.stagePicture.stageFinal.active{animation:finalSway 6s ease-in-out infinite alternate}
+@keyframes finalSway{0%{transform:scale(1.02) translateY(1.5%) translateX(-.6%)}100%{transform:scale(1.065) translateY(-1.3%) translateX(.8%)}}
+.stageArt:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(0,32,59,.43) 0%, transparent 22%,transparent 67%,rgba(0,36,68,.57) 100%)}
+.top{position:relative;z-index:9}.title{font-size:clamp(25px,4vw,65px)}.footer{z-index:9;bottom:2%}.center-text{z-index:8;bottom:17.5%;font-size:clamp(18px,2.5vw,41px)}
+.stageNotice{z-index:8;top:20%;box-shadow:0 4px 16px #002e5880}
+.bubbleWorld{z-index:4}.caustics{z-index:3}.sparkles{z-index:10}.splash{z-index:8;top:18%;left:47%;font-size:clamp(50px,9vw,140px)}
+.corner,.status{z-index:12}.status{max-width:48vw}
+.board[data-stage="5"] .splash{animation:waterSplash 2.8s ease-in-out infinite}
+@media(max-width:700px){.stagePicture{object-fit:cover;object-position:50% center}.stageNotice{top:21%}.center-text{bottom:23%}}
+</style></head><body><main class="board" id="board" data-stage="0"><div class="stageArt" id="stageArt"><img id="stagePicA" class="stagePicture active" src="assets/whale_stage_0.png" alt="바다 쓰레기에 갇힌 아픈 고래"><img id="stagePicB" class="stagePicture" src="assets/whale_stage_0.png" alt="고래가 회복하는 모습"></div><div class="backdrop"></div><div class="cleanSea"></div><div class="seaFloor"></div><div class="caustics"></div><div class="bubbleWorld" id="bubbleWorld"></div><div class="whaleHero"><img src="assets/whale_happy.png" alt="기운을 되찾아 헤엄치는 고래"></div><div class="splash" aria-hidden="true">💦</div><div class="sparkles" id="sparkles"></div><div class="successFly" id="successFly">잘했어! +1</div><div class="stageNotice" id="stageNotice">고래를 도와줘!</div><header class="top"><div><div class="title">고래를 구해요!</div><div class="sub">쓰레기를 바르게 분리하면 고래가 건강해져요!</div></div><div class="counter"><small>구조한 쓰레기</small><strong id="count">0 / 25</strong></div></header><div class="happy" id="happy"><img src="assets/whale_happy.png" alt="기뻐하는 고래"><h2>고마워!<br>다 함께<br>구해 줬어!</h2></div><div class="center-text" id="message">도와줘! 바다가 너무 아파요!</div><div class="footer"><div class="meter" id="meter" aria-label="구조 진행 상태"></div><div class="milestones"><span class="milestone" id="m0">시작</span><span class="milestone" id="m1">쓰레기 감소</span><span class="milestone" id="m2">그물 제거</span><span class="milestone" id="m3">기운 회복</span><span class="milestone" id="m4">고래 구조 성공!</span></div></div><button class="corner" id="settingsBtn">⚙ 교사 설정</button><div class="status" id="status">연결 준비 중</div></main>
 <div class="overlay" id="overlay"><div class="settings"><h2>선생님 설정</h2><p>반 전체의 공동 목표를 설정합니다. 목표 변경 시 진행 기록은 0으로 초기화됩니다.</p><label for="goal">구조 목표 (1~200회)</label><input id="goal" type="number" min="1" max="200" value="25"><div class="buttons"><button id="apply">목표 적용</button><button class="secondary" id="add">시연 +1</button><button class="secondary" id="undo">1회 되돌리기</button><button class="secondary" id="reset">처음부터</button><button class="secondary" id="full">전체 화면</button><button class="secondary" id="close">닫기</button></div><p style="font-size:13px">시연 +1은 실제 구조 성공에 포함됩니다. Firebase 설정 전에는 같은 브라우저의 탭끼리만 연결되는 데모입니다.</p></div></div>
 <script src="whale-config.js"></script><script type="module">
 import {subscribe,initSync,isDemo,award,setGoal,reset,undo} from './whale-sync.js';
-const $=id=>document.getElementById(id);let last=-1,lastStage=-1,seenRevision=-1,seenReady=false;
+const $=id=>document.getElementById(id);let visiblePicture='stagePicA';let pictureStage=0;let last=-1,lastStage=-1,seenRevision=-1,seenReady=false;
 const stages=[
  {text:'도와줘! 바다가 너무 아파요!',tag:'① 고래가 아파요'},
  {text:'쓰레기가 줄어들고 있어요!',tag:'② 조금 나아졌어요'},
@@ -62,6 +77,14 @@ const stages=[
  {text:'우와! 이제 헤엄칠 수 있어!',tag:'⑤ 활기를 되찾았어요'},
  {text:'우리가 함께 고래를 구했어요!',tag:'⑥ 고래 구조 성공!'}
 ];
+const stageSources=Array.from({length:6},(_,i)=>`assets/whale_stage_${i}.png`);
+for(const src of stageSources){const im=new Image();im.src=src}
+function setArtwork(next){
+ if(next===pictureStage)return;
+ const old=$ (visiblePicture),newId=visiblePicture==='stagePicA'?'stagePicB':'stagePicA',fresh=$(newId);
+ fresh.src=stageSources[next];fresh.alt=stages[next].tag;fresh.classList.toggle('stageFinal',next===5);
+ fresh.classList.add('active');old.classList.remove('active');visiblePicture=newId;pictureStage=next;
+}
 let audioCtx=null;
 function sound(stage){try{audioCtx ||=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();let now=audioCtx.currentTime;for(let i=0;i<(stage===5?5:2);i++){let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime((stage===5?440:520)+i*110,now+i*.14);g.gain.setValueAtTime(.0001,now+i*.14);g.gain.exponentialRampToValueAtTime(.085,now+i*.14+.018);g.gain.exponentialRampToValueAtTime(.0001,now+i*.14+.24);o.connect(g).connect(audioCtx.destination);o.start(now+i*.14);o.stop(now+i*.14+.26)}}catch{}}
 function celebrate(stage){const board=$('board');const label=$('successFly');label.textContent=stage===5?'🐳 고래 구조 성공!':'참 잘했어! +1';label.classList.remove('go');void label.offsetWidth;label.classList.add('go');const p=document.createElement('div');p.className='pulse';board.append(p);setTimeout(()=>p.remove(),1300);const layer=$('sparkles');for(let i=0;i<(stage===5?45:12);i++){const el=document.createElement('span');el.className='spark';el.textContent=i%3===0?'✦':'★';el.style.setProperty('--x',(15+Math.random()*70)+'%');el.style.setProperty('--y',(25+Math.random()*50)+'%');layer.append(el);setTimeout(()=>el.remove(),1500)}sound(stage)}
@@ -70,7 +93,7 @@ for(let i=0;i<4;i++){let f=document.createElement('div');f.className='fish';f.te
 subscribe(s=>{
  const pct=Math.min(1,s.count/s.goal),stage=s.count>=s.goal?5:Math.min(4,Math.floor(pct*5));
  $('count').textContent=`${s.count} / ${s.goal}`;
- $('board').dataset.stage=String(stage);
+ $('board').dataset.stage=String(stage);setArtwork(stage);
  $('message').textContent=stages[stage].text;
  $('stageNotice').textContent=stages[stage].tag;
  $('meter').style.setProperty('--slots',Math.min(s.goal,50));
